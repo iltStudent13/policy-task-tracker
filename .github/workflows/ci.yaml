@@ -1,0 +1,59 @@
+# Workflow that runs on push
+# installs dependencies for both api and client
+# run typescript compilation checks tsc --noEmit
+# build docker images
+name: Project Task Tracker CI
+env:
+  NODE_VERSION: "20"
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install dependencies
+        run: npm install
+      - name: Run Lint
+        run: npm run lint
+      - name: Run tests
+        run: npm test
+      - name: Build
+        run: npm run build
+  # docker-push:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #
+  #     - name: Configure AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v2
+  #       with:
+  #         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }} # or use aws-access-key-id / secret if simpler
+  #         aws-region: us-east-1
+  #
+  #     - name: Login to Amazon ECR
+  #       id: login-ecr
+  #       uses: aws-actions/amazon-ecr-login@v1
+  #
+  #     - name: Build, tag, and push image
+  #       env:
+  #         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+  #         IMAGE_NAME: my-app
+  #       run: |
+  #         IMAGE_TAG=${GITHUB_SHA::7}
+  #         docker build -t $ECR_REGISTRY/$IMAGE_NAME:$IMAGE_TAG .
+  #         docker push $ECR_REGISTRY/$IMAGE_NAME:$IMAGE_TAG
