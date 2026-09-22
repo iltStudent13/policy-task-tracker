@@ -6,5 +6,12 @@ export async function connectDB(): Promise<void> {
   if (!conn) {
     throw new Error("MONGO_URI is not defined");
   }
-  await mongoose.connect(conn);
+
+  try {
+    await mongoose.connect(conn);
+    console.log("Database connected successfully");
+  } catch (error) {
+    console.error("Database connection error:", error);
+    throw error;
+  }
 }

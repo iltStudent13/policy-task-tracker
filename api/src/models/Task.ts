@@ -6,6 +6,7 @@ export interface ITask extends Document {
   description?: string;
   status: string;
   assignedTo?: Types.ObjectId;
+  project?: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -23,6 +24,7 @@ const taskSchema = new Schema<ITask>(
     description: {
       type: String,
       trim: true,
+      required: true,
     },
     status: {
       type: String,
@@ -32,6 +34,11 @@ const taskSchema = new Schema<ITask>(
     assignedTo: {
       type: Schema.Types.ObjectId,
       ref: "User",
+    },
+    project: {
+      type: Schema.Types.ObjectId,
+      ref: "Project",
+      required: true,
     },
   },
   {
