@@ -49,8 +49,12 @@ router.post(
     if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-    const token = generateToken(user);
-    res.json({ token, expires: token.expiresAt, user });
+    const generatedToken = generateToken(user);
+    res.json({
+      token: generatedToken.token,
+      expires: generatedToken.expiresAt,
+      user,
+    });
   },
 );
 

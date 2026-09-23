@@ -1,8 +1,4 @@
-import {
-  Router,
-  type Request,
-  type Response
-} from "express";
+import { Router, type Request, type Response } from "express";
 import { Task } from "../models/Task";
 import { Project } from "../models/Project";
 import { User } from "../models/User";
@@ -13,7 +9,7 @@ const router = Router();
 router.use(authenticate);
 
 router.get("/", async (req: Request, res: Response) => {
-  const [totalTasks, tasksByStatus, recentTasks, totalProjects, totalUsers] =
+  const [totalTasks, tasksByStatusResults, totalProjects, recentTasks, totalUsers] =
     await Promise.all([
       Task.countDocuments(),
       Task.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
@@ -22,11 +18,22 @@ router.get("/", async (req: Request, res: Response) => {
       User.countDocuments(),
     ]);
 
+  const tasksByStatus = tasksByStatusResults.reduce<Record<string, number>>(
+    (statusCounts, entry) => {
+      if (typeof entry._id === "string") {
+        statusCounts[entry._id] = entry.count;
+      }
+
+      return statusCounts;
+    },
+    {},
+  );
+
   res.status(200).json({
     totalTasks,
     tasksByStatus,
-    recentTasks,
     totalProjects,
+    recentTasks,
     totalUsers,
   });
 });

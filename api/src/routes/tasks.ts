@@ -99,16 +99,24 @@ router.post(
       .optional()
       .isMongoId()
       .withMessage("Invalid assignedTo ID"),
-    body("projectNumber").isMongoId().withMessage("Invalid project Number"),
+    body("project")
+      .optional()
+      .isMongoId()
+      .withMessage("Invalid project ID"),
+    body("projectNumber")
+      .optional()
+      .isMongoId()
+      .withMessage("Invalid project Number"),
   ]),
   async (req: Request, res: Response) => {
-    const { title, description, status, assignedTo, projectNumber } = req.body;
+    const { title, description, status, assignedTo } = req.body;
+    const projectId = req.body.project ?? req.body.projectNumber;
     const task = new Task({
       title,
       description,
       status,
       assignedTo,
-      projectNumber,
+      project: projectId,
     });
     await task.save();
     res.status(201).json(task);
@@ -128,14 +136,22 @@ router.put(
       .optional()
       .isMongoId()
       .withMessage("Invalid assignedTo ID"),
-    body("projectNumber").isMongoId().withMessage("Invalid project Number"),
+    body("project")
+      .optional()
+      .isMongoId()
+      .withMessage("Invalid project ID"),
+    body("projectNumber")
+      .optional()
+      .isMongoId()
+      .withMessage("Invalid project Number"),
   ]),
   async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { title, description, status, assignedTo, projectNumber } = req.body;
+    const { title, description, status, assignedTo } = req.body;
+    const projectId = req.body.project ?? req.body.projectNumber;
     const task = await Task.findByIdAndUpdate(
       id,
-      { title, description, status, assignedTo, projectNumber },
+      { title, description, status, assignedTo, project: projectId },
       { new: true },
     );
     if (!task) {
@@ -158,14 +174,22 @@ router.patch(
       .optional()
       .isMongoId()
       .withMessage("Invalid assignedTo ID"),
-    body("projectNumber").isMongoId().withMessage("Invalid project Number"),
+    body("project")
+      .optional()
+      .isMongoId()
+      .withMessage("Invalid project ID"),
+    body("projectNumber")
+      .optional()
+      .isMongoId()
+      .withMessage("Invalid project Number"),
   ]),
   async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { title, description, status, assignedTo, projectNumber } = req.body;
+    const { title, description, status, assignedTo } = req.body;
+    const projectId = req.body.project ?? req.body.projectNumber;
     const task = await Task.findByIdAndUpdate(
       id,
-      { title, description, status, assignedTo, projectNumber },
+      { title, description, status, assignedTo, project: projectId },
       { new: true },
     );
     if (!task) {

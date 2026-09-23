@@ -1,10 +1,8 @@
-# Workflow that runs on push
-# installs dependencies for both api and client
-# run typescript compilation checks tsc --noEmit
-# build docker images
 name: Project Task Tracker CI
+
 env:
   NODE_VERSION: "20"
+
 on:
   push:
     branches:
@@ -14,24 +12,37 @@ on:
       - main
 
 jobs:
-  build:
+  backend-testing:
+    name: Backend Testing
     runs-on: ubuntu-latest
+
     steps:
-      - name: checkout
-        uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Set up Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: api/package-lock.json
+
       - name: Install dependencies
+        working-directory: ./api
         run: npm install
-      - name: Run Lint
-        run: npm run lint
+
+      - name: Run TypeScript compilation check
+        working-directory: ./api
+        run: npm run type-check
+
       - name: Run tests
+        working-directory: ./api
         run: npm test
+
       - name: Build
+        working-directory: ./api
         run: npm run build
+
   # docker-push:
   #   needs: build
   #   runs-on: ubuntu-latest
@@ -42,7 +53,7 @@ jobs:
   #     - name: Configure AWS credentials
   #       uses: aws-actions/configure-aws-credentials@v2
   #       with:
-  #         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }} # or use aws-access-key-id / secret if simpler
+  #         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
   #         aws-region: us-east-1
   #
   #     - name: Login to Amazon ECR

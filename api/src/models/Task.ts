@@ -46,8 +46,8 @@ const taskSchema = new Schema<ITask>(
   },
 );
 
-taskSchema.pre("save", async function () {
-  if (this.isNew || this.taskNumber) return;
+taskSchema.pre("validate", function () {
+  if (!this.isNew || this.taskNumber) return;
 
   this.taskNumber = `TSK-${Math.floor(Math.random() * 1000)}`;
 });
