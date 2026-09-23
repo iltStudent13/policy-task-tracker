@@ -29,7 +29,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./api
-        run: npm install
+        run: npm ci
 
       - name: Run TypeScript compilation check
         working-directory: ./api
