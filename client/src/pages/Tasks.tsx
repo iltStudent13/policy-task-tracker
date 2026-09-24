@@ -2,6 +2,7 @@
 import { useState, useEffect, type SubmitEvent, type ChangeEvent } from "react";
 import type { Task, Project, User } from "../types";
 import api from "../services/api";
+import { Link } from "react-router-dom";
 
 const taskStatusOptions = ["open", "in-progress", "completed", "pending"];
 
@@ -10,6 +11,8 @@ export default function Tasks() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalTasks, setTotalTasks] = useState(0);
   const [newTask, setNewTask] = useState<{
     title: string;
     description: string;
@@ -25,9 +28,14 @@ export default function Tasks() {
   });
 
   useEffect(() => {
-    api
-      .get("/tasks")
-      .then((response) => setTasks(response.data.tasks ?? response.data));
+    api.get("/tasks", { params: { page, limit: 10 } }).then((response) => {
+      const fetchedTasks = response.data.tasks ?? response.data;
+      setTasks(Array.isArray(fetchedTasks) ? fetchedTasks : []);
+      setTotalTasks(response.data.total ?? fetchedTasks.length ?? 0);
+    });
+  }, [page]);
+
+  useEffect(() => {
     api
       .get("/projects")
       .then((response) => setProjects(response.data.projects ?? response.data));
@@ -153,6 +161,9 @@ export default function Tasks() {
     );
   };
 
+  const totalPages = Math.max(Math.ceil(totalTasks / 10), 1);
+  const shouldShowPagination = totalTasks > 10;
+
   return (
     <main className="tasks-page">
       <header className="dashboard-header">
@@ -276,7 +287,11 @@ export default function Tasks() {
                 <tbody>
                   {tasks.map((task) => (
                     <tr key={task._id}>
-                      <td>{task.taskNumber ?? "-"}</td>
+                      <td>
+                        <Link to={`/tasks/${task._id}`}>
+                          {task.taskNumber ?? "-"}
+                        </Link>
+                      </td>
                       <td>{getTaskTitle(task)}</td>
                       <td>{task.description ?? "-"}</td>
                       <td>
@@ -304,6 +319,47 @@ export default function Tasks() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+
+          {shouldShowPagination && (
+            <div className="task-pagination" aria-label="Task pagination">
+              <button
+                type="button"
+                className="pagination-link"
+                disabled={page === 1}
+                onClick={() => setPage((current) => Math.max(current - 1, 1))}
+              >
+                Previous
+              </button>
+
+              {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+                (pageNumber) => (
+                  <button
+                    key={pageNumber}
+                    type="button"
+                    className={
+                      pageNumber === page
+                        ? "pagination-link active"
+                        : "pagination-link"
+                    }
+                    onClick={() => setPage(pageNumber)}
+                  >
+                    {pageNumber}
+                  </button>
+                ),
+              )}
+
+              <button
+                type="button"
+                className="pagination-link"
+                disabled={page === totalPages}
+                onClick={() =>
+                  setPage((current) => Math.min(current + 1, totalPages))
+                }
+              >
+                Next
+              </button>
             </div>
           )}
         </div>
