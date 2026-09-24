@@ -69,6 +69,7 @@ export type ProjectStatus = "open" | "in-progress" | "completed" | "pending";
 
 export interface Task {
   _id: ObjectId;
+  title: string;
   taskNumber: string;
   description?: string;
   status: ProjectStatus;

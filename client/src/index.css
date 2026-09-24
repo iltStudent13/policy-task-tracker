@@ -415,6 +415,37 @@
   justify-content: flex-start;
 }
 
+.task-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.pagination-link {
+  border: 1px solid #dbe4ee;
+  border-radius: 0.55rem;
+  background: #ffffff;
+  color: #173b57;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.45rem 0.7rem;
+  cursor: pointer;
+}
+
+.pagination-link.active {
+  background: #173b57;
+  border-color: #173b57;
+  color: #ffffff;
+}
+
+.pagination-link:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .small-button {
   padding: 0.38rem 0.6rem;
   border: 1px solid #dbe4ee;

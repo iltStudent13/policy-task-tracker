@@ -7,7 +7,7 @@ import { Project } from "./models/Project";
 
 async function seed() {
   await mongoose.connect(
-    process.env.MONGO_URI || "mongodb://localhost:27017/policy-tracker",
+    process.env.MONGO_URI || "mongodb://localhost:27017/policy-task-tracker",
   );
 
   // Clear existing data
@@ -19,19 +19,19 @@ async function seed() {
   const admin = new User({
     name: "Admin",
     email: "admin@example.com",
-    password: "password",
+    password: "Password123!",
     role: "admin",
   });
   const user1 = new User({
     name: "User1",
     email: "user1@example.com",
-    password: "password",
+    password: "Password123!",
     role: "user",
   });
   const user2 = new User({
     name: "User2",
     email: "user2@example.com",
-    password: "password",
+    password: "Password123!",
     role: "user",
   });
   await admin.save();

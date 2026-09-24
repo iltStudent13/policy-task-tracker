@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import Navbar from "./components/Navbar";
 import Projects from "./pages/Projects";
 import Tasks from "./pages/Tasks";
+import TaskDetail from "./pages/TaskDetail";
 
 export default function App() {
   return (
@@ -35,6 +36,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Tasks />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tasks/:id"
+          element={
+            <ProtectedRoute>
+              <TaskDetail />
             </ProtectedRoute>
           }
         />
