@@ -1,0 +1,39 @@
+version: "3.8"
+services:
+  mongo:
+    image: mongo:7
+    container_name: ptt-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    restart: unless-stopped
+  
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: ptt-api
+    ports:
+      - "4000:4000"
+    depends_on:
+      - mongo
+    restart: unless-stopped
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/project-task-tracker
+      - JWT_SECRET= dev-secret-change-in-production
+      - PORT=4000
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: ptt-client
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  mongo-data:

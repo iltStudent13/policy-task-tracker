@@ -3,13 +3,11 @@ import type { Task, Project, User } from "../types";
 import api from "../services/api";
 import { useState, useEffect } from "react";
 
-const taskStatusOptions = ["open", "in-progress", "completed", "pending"];
-
 export default function TaskDetail() {
   const [task, setTask] = useState<Task | null>(null);
   const [project, setProject] = useState<Project | null>(null);
   const [assignee, setAssignee] = useState<User | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
+  const [, setUsers] = useState<User[]>([]);
 
   const getProjectName = (task: Task) => {
     if (typeof task.project !== "string" && task.project?.name) {
