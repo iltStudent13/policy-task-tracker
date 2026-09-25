@@ -57,7 +57,11 @@ router.get(
         search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
         "i",
       );
-      filter.$or = [{ taskNumber: searchRegex }, { title: searchRegex }];
+      filter.$or = [
+        { taskNumber: searchRegex },
+        { title: searchRegex },
+        { description: searchRegex },
+      ];
     }
 
     const [tasks, total] = await Promise.all([
