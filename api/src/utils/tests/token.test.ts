@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { generateToken, type ITokenUser } from "../token";
+import { generateToken, type ITokenUser } from "../token.js";
 import jwt from "jsonwebtoken";
 
 describe("Token Utility", () => {

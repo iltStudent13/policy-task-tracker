@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import type { Request, Response, NextFunction } from "express";
-import { User } from "../models/User";
+import { User } from "../models/User.js";
 
 export async function authenticate(
   req: Request,

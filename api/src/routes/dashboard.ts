@@ -1,26 +1,34 @@
 import { Router, type Request, type Response } from "express";
-import { Task } from "../models/Task";
-import { Project } from "../models/Project";
-import { User } from "../models/User";
-import { authenticate } from "../middleware/auth";
+import { Task } from "../models/Task.js";
+import { Project } from "../models/Project.js";
+import { User } from "../models/User.js";
+import { authenticate } from "../middleware/auth.js";
 
 const router = Router();
 
 router.use(authenticate);
 
 router.get("/", async (req: Request, res: Response) => {
-  const [totalTasks, tasksByStatusResults, totalProjects, recentTasks, totalUsers] =
-    await Promise.all([
-      Task.countDocuments(),
-      Task.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
-      Project.countDocuments(),
-      Task.find().sort({ createdAt: -1 }).limit(5),
-      User.countDocuments(),
-    ]);
+  const [
+    totalTasks,
+    tasksByStatusResults,
+    totalProjects,
+    recentTasks,
+    totalUsers,
+  ] = await Promise.all([
+    Task.countDocuments(),
+    Task.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
+    Project.countDocuments(),
+    Task.find().sort({ createdAt: -1 }).limit(5),
+    User.countDocuments(),
+  ]);
 
   const tasksByStatus = tasksByStatusResults.reduce<Record<string, number>>(
-    (statusCounts, entry) => {
-      if (typeof entry._id === "string") {
+    (
+      statusCounts: Record<string, number>,
+      entry: { _id?: string; count?: number },
+    ) => {
+      if (typeof entry._id === "string" && typeof entry.count === "number") {
         statusCounts[entry._id] = entry.count;
       }
 

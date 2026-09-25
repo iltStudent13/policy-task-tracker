@@ -1,8 +1,8 @@
 import { Router, type Request, type Response } from "express";
 import { body, param, query } from "express-validator";
-import { Project } from "../models/Project";
-import { authenticate } from "../middleware/auth";
-import { validate } from "../middleware/validate";
+import { Project } from "../models/Project.js";
+import { authenticate } from "../middleware/auth.js";
+import { validate } from "../middleware/validate.js";
 
 const router = Router();
 

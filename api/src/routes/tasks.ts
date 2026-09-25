@@ -1,9 +1,9 @@
 import { Router, type Request, type Response } from "express";
 import { body, param, query } from "express-validator";
 import type { QueryFilter } from "mongoose";
-import { Task, type ITask } from "../models/Task";
-import { authenticate } from "../middleware/auth";
-import { validate } from "../middleware/validate";
+import { Task, type ITask } from "../models/Task.js";
+import { authenticate } from "../middleware/auth.js";
+import { validate } from "../middleware/validate.js";
 
 const router = Router();
 
@@ -99,10 +99,7 @@ router.post(
       .optional()
       .isMongoId()
       .withMessage("Invalid assignedTo ID"),
-    body("project")
-      .optional()
-      .isMongoId()
-      .withMessage("Invalid project ID"),
+    body("project").optional().isMongoId().withMessage("Invalid project ID"),
     body("projectNumber")
       .optional()
       .isMongoId()
@@ -136,10 +133,7 @@ router.put(
       .optional()
       .isMongoId()
       .withMessage("Invalid assignedTo ID"),
-    body("project")
-      .optional()
-      .isMongoId()
-      .withMessage("Invalid project ID"),
+    body("project").optional().isMongoId().withMessage("Invalid project ID"),
     body("projectNumber")
       .optional()
       .isMongoId()
@@ -174,10 +168,7 @@ router.patch(
       .optional()
       .isMongoId()
       .withMessage("Invalid assignedTo ID"),
-    body("project")
-      .optional()
-      .isMongoId()
-      .withMessage("Invalid project ID"),
+    body("project").optional().isMongoId().withMessage("Invalid project ID"),
     body("projectNumber")
       .optional()
       .isMongoId()

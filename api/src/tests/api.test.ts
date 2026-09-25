@@ -2,17 +2,18 @@ import { beforeAll, beforeEach, afterAll, describe, expect, it } from "vitest";
 import request from "supertest";
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
-import app from "../app";
-import { User } from "../models/User";
-import { Project } from "../models/Project";
-import { Task } from "../models/Task";
+import app from "../app.js";
+import { User } from "../models/User.js";
+import { Project } from "../models/Project.js";
+import { Task } from "../models/Task.js";
 
 process.env.JWT_SECRET = process.env.JWT_SECRET || "development-secret";
 
 let mongoServer: MongoMemoryServer;
 
 async function registerUser(overrides: Partial<Record<string, string>> = {}) {
-  const email = overrides.email || `user.${Date.now()}${Math.random()}@example.com`;
+  const email =
+    overrides.email || `user.${Date.now()}${Math.random()}@example.com`;
   const password = overrides.password || "Password123!";
   const payload = {
     name: overrides.name || "Test User",
@@ -28,7 +29,9 @@ async function registerUser(overrides: Partial<Record<string, string>> = {}) {
 }
 
 async function loginUser(email: string, password: string) {
-  const response = await request(app).post("/api/auth/login").send({ email, password });
+  const response = await request(app)
+    .post("/api/auth/login")
+    .send({ email, password });
 
   expect(response.status).toBe(200);
   expect(response.body).toHaveProperty("token");
@@ -42,7 +45,11 @@ describe("API endpoint scenarios", () => {
   }, 30000);
 
   beforeEach(async () => {
-    await Promise.all([User.deleteMany({}), Project.deleteMany({}), Task.deleteMany({})]);
+    await Promise.all([
+      User.deleteMany({}),
+      Project.deleteMany({}),
+      Task.deleteMany({}),
+    ]);
   });
 
   afterAll(async () => {
@@ -121,12 +128,14 @@ describe("API endpoint scenarios", () => {
     const email = `auth.${Date.now()}@example.com`;
     const password = "Password123!";
 
-    const registerResponse = await request(app).post("/api/auth/register").send({
-      name: "Auth User",
-      email,
-      password,
-      role: "admin",
-    });
+    const registerResponse = await request(app)
+      .post("/api/auth/register")
+      .send({
+        name: "Auth User",
+        email,
+        password,
+        role: "admin",
+      });
 
     expect(registerResponse.status).toBe(201);
     expect(registerResponse.body.user.email).toBe(email);
