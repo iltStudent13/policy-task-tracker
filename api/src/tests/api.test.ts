@@ -124,6 +124,49 @@ describe("API endpoint scenarios", () => {
     expect(response.body).toHaveProperty("errors");
   });
 
+  it("GET filters tasks by search and status", async () => {
+    const { payload } = await registerUser();
+    const token = await loginUser(payload.email, payload.password);
+    const user = await User.findOne({ email: payload.email });
+
+    const project = await Project.create({
+      projectNumber: "PRJ-3001",
+      name: "Filter Project",
+      status: "open",
+      projectType: "core",
+      owner: user!._id,
+      startDate: new Date("2024-03-01"),
+    });
+
+    await Task.create([
+      {
+        taskNumber: "TSK-1001",
+        title: "Policy review",
+        description: "Review the compliance checklist",
+        status: "open",
+        assignedTo: user!._id,
+        project: project._id,
+      },
+      {
+        taskNumber: "TSK-1002",
+        title: "Draft summary",
+        description: "Prepare the policy review notes",
+        status: "completed",
+        assignedTo: user!._id,
+        project: project._id,
+      },
+    ]);
+
+    const response = await request(app)
+      .get("/api/tasks")
+      .set("Authorization", `Bearer ${token}`)
+      .query({ search: "compliance checklist", status: "open" });
+
+    expect(response.status).toBe(200);
+    expect(response.body.tasks).toHaveLength(1);
+    expect(response.body.tasks[0].taskNumber).toBe("TSK-1001");
+  });
+
   it("Auth endpoints work for register and login", async () => {
     const email = `auth.${Date.now()}@example.com`;
     const password = "Password123!";

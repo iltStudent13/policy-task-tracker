@@ -362,6 +362,36 @@
   transform: translateY(-1px);
 }
 
+.task-filters {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(12rem, 1fr);
+  gap: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.task-filter-field {
+  min-width: 0;
+}
+
+.task-filter-field input,
+.task-filter-field select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid #dbe4ee;
+  border-radius: 0.7rem;
+  background: #fff;
+  color: #102033;
+  font: inherit;
+}
+
+.task-filter-field input:focus,
+.task-filter-field select:focus {
+  outline: 2px solid rgba(23, 59, 87, 0.16);
+  outline-offset: 1px;
+  border-color: #173b57;
+}
+
 .secondary-button {
   background: #eef4fa;
   color: #173b57;
@@ -707,6 +737,10 @@
 
   .cards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .task-filters {
+    grid-template-columns: 1fr;
   }
 }
 

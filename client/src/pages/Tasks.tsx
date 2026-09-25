@@ -5,6 +5,7 @@ import api from "../services/api";
 import { Link } from "react-router-dom";
 
 const taskStatusOptions = ["open", "in-progress", "completed", "pending"];
+const taskFilterStatusOptions = ["all", ...taskStatusOptions] as const;
 
 export default function Tasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -13,6 +14,9 @@ export default function Tasks() {
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalTasks, setTotalTasks] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] =
+    useState<(typeof taskFilterStatusOptions)[number]>("all");
   const [newTask, setNewTask] = useState<{
     title: string;
     description: string;
@@ -27,13 +31,24 @@ export default function Tasks() {
     assignedTo: "",
   });
 
-  useEffect(() => {
-    api.get("/tasks", { params: { page, limit: 10 } }).then((response) => {
-      const fetchedTasks = response.data.tasks ?? response.data;
-      setTasks(Array.isArray(fetchedTasks) ? fetchedTasks : []);
-      setTotalTasks(response.data.total ?? fetchedTasks.length ?? 0);
+  const loadTasks = async () => {
+    const response = await api.get("/tasks", {
+      params: {
+        page,
+        limit: 10,
+        ...(searchQuery.trim() ? { search: searchQuery.trim() } : {}),
+        ...(statusFilter !== "all" ? { status: statusFilter } : {}),
+      },
     });
-  }, [page]);
+
+    const fetchedTasks = response.data.tasks ?? response.data;
+    setTasks(Array.isArray(fetchedTasks) ? fetchedTasks : []);
+    setTotalTasks(response.data.total ?? fetchedTasks.length ?? 0);
+  };
+
+  useEffect(() => {
+    void loadTasks();
+  }, [page, searchQuery, statusFilter]);
 
   useEffect(() => {
     api
@@ -60,12 +75,7 @@ export default function Tasks() {
     };
 
     if (editingTaskId) {
-      api.put(`/tasks/${editingTaskId}`, payload).then((response) => {
-        setTasks((current) =>
-          current.map((task) =>
-            task._id === editingTaskId ? response.data : task,
-          ),
-        );
+      api.put(`/tasks/${editingTaskId}`, payload).then(() => {
         setEditingTaskId(null);
         setNewTask({
           title: "",
@@ -74,12 +84,12 @@ export default function Tasks() {
           project: "",
           assignedTo: "",
         });
+        void loadTasks();
       });
       return;
     }
 
-    api.post("/tasks", payload).then((response) => {
-      setTasks((current) => [...current, response.data]);
+    api.post("/tasks", payload).then(() => {
       setNewTask({
         title: "",
         description: "",
@@ -87,6 +97,7 @@ export default function Tasks() {
         project: "",
         assignedTo: "",
       });
+      void loadTasks();
     });
   };
 
@@ -109,7 +120,6 @@ export default function Tasks() {
 
   const handleDelete = (taskId: string) => {
     api.delete(`/tasks/${taskId}`).then(() => {
-      setTasks((current) => current.filter((task) => task._id !== taskId));
       if (editingTaskId === taskId) {
         setEditingTaskId(null);
         setNewTask({
@@ -120,7 +130,18 @@ export default function Tasks() {
           assignedTo: "",
         });
       }
+      void loadTasks();
     });
+  };
+
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    setPage(1);
+  };
+
+  const handleStatusFilterChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setStatusFilter(e.target.value as (typeof taskFilterStatusOptions)[number]);
+    setPage(1);
   };
 
   const getProjectName = (task: Task) => {
@@ -163,6 +184,7 @@ export default function Tasks() {
 
   const totalPages = Math.max(Math.ceil(totalTasks / 10), 1);
   const shouldShowPagination = totalTasks > 10;
+  const hasActiveFilters = searchQuery.trim() !== "" || statusFilter !== "all";
 
   return (
     <main className="tasks-page">
@@ -268,8 +290,35 @@ export default function Tasks() {
 
         <div className="dashboard-panel task-panel task-table-panel">
           <h2>Task List</h2>
+          <div className="task-filters" aria-label="Task filters">
+            <label className="field task-filter-field">
+              <span>Search</span>
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                placeholder="Search title, description, or task #"
+              />
+            </label>
+
+            <label className="field task-filter-field">
+              <span>Status</span>
+              <select value={statusFilter} onChange={handleStatusFilterChange}>
+                {taskFilterStatusOptions.map((status) => (
+                  <option key={status} value={status}>
+                    {status === "all" ? "All statuses" : status}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+
           {tasks.length === 0 ? (
-            <p className="empty-state">No tasks available.</p>
+            <p className="empty-state">
+              {hasActiveFilters
+                ? "No tasks match the current filters."
+                : "No tasks available."}
+            </p>
           ) : (
             <div className="task-table-container">
               <table className="task-table">
