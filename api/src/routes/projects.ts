@@ -1,8 +1,8 @@
 import { Router, type Request, type Response } from "express";
 import { body, param, query } from "express-validator";
-import { Project } from "../models/Project";
-import { authenticate } from "../middleware/auth";
-import { validate } from "../middleware/validate";
+import { Project } from "../models/Project.js";
+import { authenticate } from "../middleware/auth.js";
+import { validate } from "../middleware/validate.js";
 
 const router = Router();
 
@@ -82,6 +82,9 @@ router.post(
   "/",
   validate([
     body("name").isString().withMessage("Name must be a string"),
+    body("projectNumber")
+      .isString()
+      .withMessage("Project number must be a string"),
     body("status")
       .isIn(["open", "in-progress", "completed", "pending"])
       .withMessage("Invalid status"),
@@ -92,14 +95,22 @@ router.post(
     body("startDate").isISO8601().withMessage("Invalid start date"),
   ]),
   async (req: Request, res: Response) => {
-    const { name, description, status, projectType, owner, startDate } =
-      req.body;
-    const project = new Project({
+    const {
       name,
+      projectNumber,
       description,
       status,
       projectType,
-      owner: req.user!._id,
+      owner,
+      startDate,
+    } = req.body;
+    const project = new Project({
+      name,
+      projectNumber,
+      description,
+      status,
+      projectType,
+      owner: owner ?? req.user!._id,
       startDate: new Date(startDate),
     });
     await project.save();
@@ -112,6 +123,9 @@ router.put(
   validate([
     param("id").isMongoId().withMessage("Invalid project ID"),
     body("name").isString().withMessage("Name must be a string"),
+    body("projectNumber")
+      .isString()
+      .withMessage("Project number must be a string"),
     body("status")
       .isIn(["open", "in-progress", "completed", "pending"])
       .withMessage("Invalid status"),
@@ -123,12 +137,20 @@ router.put(
   ]),
   async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { name, description, status, projectType, owner, startDate } =
-      req.body;
+    const {
+      name,
+      projectNumber,
+      description,
+      status,
+      projectType,
+      owner,
+      startDate,
+    } = req.body;
     const project = await Project.findByIdAndUpdate(
       id,
       {
         name,
+        projectNumber,
         description,
         status,
         projectType,

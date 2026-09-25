@@ -1,11 +1,11 @@
 import express, { type Request, type Response } from "express";
 import cors from "cors";
 import mongoose from "mongoose";
-import authRoute from "./routes/auth";
-import projectsRoute from "./routes/projects";
-import tasksRoute from "./routes/tasks";
-import dashboardRoute from "./routes/dashboard";
-import { errorHandler } from "./middleware/errorHandler";
+import authRoute from "./routes/auth.js";
+import projectsRoute from "./routes/projects.js";
+import tasksRoute from "./routes/tasks.js";
+import dashboardRoute from "./routes/dashboard.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
 

@@ -1,10 +1,10 @@
 import { Router, type Request, type Response } from "express";
 import jwt from "jsonwebtoken";
 import { body } from "express-validator";
-import { User } from "../models/User";
-import { authenticate } from "../middleware/auth";
-import { validate } from "../middleware/validate";
-import { generateToken } from "../utils/token";
+import { User } from "../models/User.js";
+import { authenticate } from "../middleware/auth.js";
+import { validate } from "../middleware/validate.js";
+import { generateToken } from "../utils/token.js";
 
 const router = Router();
 

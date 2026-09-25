@@ -1,9 +1,9 @@
 // Generate initial seed data for the database.  3 Users: admin, user1, user2, 10 tasks and 4 projects all with different project types
 
 import mongoose from "mongoose";
-import { User } from "./models/User";
-import { Task } from "./models/Task";
-import { Project } from "./models/Project";
+import { User } from "./models/User.js";
+import { Task } from "./models/Task.js";
+import { Project } from "./models/Project.js";
 
 async function seed() {
   await mongoose.connect(
